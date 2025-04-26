@@ -1,28 +1,32 @@
 from typing import List, Dict, Optional
-from pathlib import Path
-from firecrawl import FirecrawlApp
-from qdrant_client import QdrantClient
+from pathlib import Path  # Used for filesystem path manipulation
+from firecrawl import FirecrawlApp # To crawl website documentation
+from qdrant_client import QdrantClient # To connect with Qdrant vector DB
 from qdrant_client.http import models
-from qdrant_client.http.models import Distance, VectorParams
-from fastembed import TextEmbedding
-from agents import Agent, Runner
-from openai import AsyncOpenAI
-import tempfile
-import uuid
+from qdrant_client.http.models import Distance, VectorParams # Distance metric and vector config
+from fastembed import TextEmbedding  # For generating embeddings
+from agents import Agent, Runner # Custom agent and runner classes
+from openai import AsyncOpenAI   # For async API access to OpenAI's TTS
+import tempfile # To create temporary files for audio
+import uuid  # For generating unique IDs
 import os
-from datetime import datetime
+from datetime import datetime # For working with date/time
 import time
 import streamlit as st
 from dotenv import load_dotenv
-import asyncio
- 
+import asyncio  # To run asynchronous functions
+
+# ------------------- Session Initialization -------------------
 def init_session_state():
+    
+    # Initialize Streamlit session state with default values.
+    
     defaults = {
         "initialized": False,
         "QDRANT_URL": "<QDRANT_URL>",
         "QDRANT_API_KEY": "<QDRANT_API_KEY>",
         "FIRECRAWL_API_KEY": "<FIRECRAWL_API_KEY>",
-        "OPENAI_API_KEY": "sk-proj-",
+        "OPENAI_API_KEY": "<OPENAI_API_KEY>",
         "DOC_URL": "https://docs.firecrawl.dev/introduction",
         "setup_complete": False,
         "client": None,
@@ -36,6 +40,7 @@ def init_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
+# ------------------- Streamlit Page Config -------------------
 st.set_page_config(
         page_title="Customer Support Voice Agent",
         page_icon="🎙️",
@@ -44,7 +49,8 @@ st.set_page_config(
 st.title("🎙️ Customer Support Voice Agent")
 st.caption("Your personal assistant for website — with voice!")
 
-
+# ------------------- Sidebar Configuration -------------------
+# Build the Streamlit sidebar for setting voice and starting document indexing.
 def sidebar_config():
     with st.sidebar:
         st.markdown("### 🎤 Voice Settings")
@@ -103,9 +109,13 @@ def sidebar_config():
             else:
                 st.error("Please click on Load Docs & Index!")
 
+# ------------------- Qdrant Setup -------------------
+# Connect to Qdrant and create a collection if it doesn't exist.
 def setup_qdrant_collection(QDRANT_URL: str, QDRANT_API_KEY: str, collection_name: str = "docs_embeddings"):
     client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
     embedding_model = TextEmbedding()
+
+    # Generate a sample embedding to detect dimension size
     test_embedding = list(embedding_model.embed(["test"]))[0]
     embedding_dim = len(test_embedding)
     
@@ -120,6 +130,8 @@ def setup_qdrant_collection(QDRANT_URL: str, QDRANT_API_KEY: str, collection_nam
     
     return client, embedding_model
 
+# ------------------- Documentation Crawling -------------------
+#  Use Firecrawl to scrape and return website documentation.
 def crawl_documentation(FIRECRAWL_API_KEY: str, url: str, output_dir: Optional[str] = None):
     firecrawl = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
     pages = []
@@ -172,6 +184,8 @@ def crawl_documentation(FIRECRAWL_API_KEY: str, url: str, output_dir: Optional[s
         time.sleep(1)
 
     return pages
+# ------------------- Storing Embeddings -------------------
+# Store crawled pages into Qdrant by generating embeddings.
 def store_embeddings(client: QdrantClient, embedding_model: TextEmbedding, pages: List[Dict], collection_name: str):
     for page in pages:
         embedding = list(embedding_model.embed([page["content"]]))[0]
@@ -189,7 +203,8 @@ def store_embeddings(client: QdrantClient, embedding_model: TextEmbedding, pages
                 )
             ]
         )
-
+# ------------------- Agent Setup -------------------
+#  Setup processing and TTS agents using OpenAI.
 def setup_agents(OPENAI_API_KEY: str):
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
     
@@ -218,7 +233,8 @@ def setup_agents(OPENAI_API_KEY: str):
     )
     
     return processor_agent, tts_agent
-
+# ------------------- Query Processing -------------------
+# Main function to process user query: search docs, create response, TTS conversion.
 async def process_query(
     query: str,
     client: QdrantClient,
@@ -295,6 +311,8 @@ async def process_query(
             "query": query
         }
 
+# ------------------- Streamlit App Runner -------------------
+#  Main Streamlit App logic.
 def run_streamlit():
     
     init_session_state()

@@ -15,7 +15,7 @@ A Streamlit-based AI assistant that crawls documentation from a website, stores 
 
 ---
 
-## 🧩 Architecture Overview
+## 🧩 Overview
 
 ```plaintext
 User Query
@@ -35,11 +35,9 @@ Audio Generation → Streamlit Audio Player
 ```
 
 ## 🛠️ Setup Instructions
-
-1. Clone the Repository
+1. Clone Git repository
 ```
-git clone https://github.com/your-username/support_voice_agent.git
-cd support_voice_agent
+   https://github.com/vivekdeshmukhrepos/DataScience.git
 ```
 2. Install Python Dependencies
 ```
