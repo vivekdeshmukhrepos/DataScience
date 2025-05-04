@@ -1,0 +1,1033 @@
+,id,training_data_type,question,content
+0,8618379-ddl,ddl,,"CREATE VIEW AccountTransactionHistory AS SELECT     t.TransactionID,          acc.AccountType,     a.AssetID,     t.Date,     t.Type AS TransactionType,     t.Amount,     a.CurrentValue FROM     Transactions t JOIN     Accounts acc ON t.AccountID = acc.AccountID JOIN     Assets a ON t.AssetID = a.AssetID ;"
+1,3379434-doc,documentation,,"The following columns are in the Clients table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  3 | asset-management | dbo            | Clients      | ClientID      | int         |
+|  4 | asset-management | dbo            | Clients      | Name          | nvarchar    |
+|  5 | asset-management | dbo            | Clients      | ContactInfo   | nvarchar    |
+|  6 | asset-management | dbo            | Clients      | AdvisorID     | int         |
+|  7 | asset-management | dbo            | Clients      | RiskProfile   | nvarchar    |"
+2,3379462-doc,documentation,,"The following columns are in the OverallWealthSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:---------------|:------------|
+| 56 | asset-management | dbo            | OverallWealthSummary | AssetType      | nvarchar    |
+| 57 | asset-management | dbo            | OverallWealthSummary | NumberOfAssets | int         |
+| 58 | asset-management | dbo            | OverallWealthSummary | TotalWealth    | decimal     |"
+3,8618713-ddl,ddl,,"CREATE VIEW ClientPortfolioValue AS SELECT     c.ClientID,     c.Name AS ClientName,     SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue FROM     Clients c JOIN     Portfolios p ON c.ClientID = p.ClientID JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID GROUP BY     c.ClientID, c.Name;"
+4,8618375-ddl,ddl,,"CREATE VIEW PortfolioSummary AS SELECT     p.PortfolioID,     p.Name AS PortfolioName,     c.ClientID,     c.Name AS ClientName,     SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue,     COUNT(DISTINCT pa.AssetID) AS NumberOfAssets FROM     Portfolios p JOIN     Clients c ON p.ClientID = c.ClientID JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID GROUP BY     p.PortfolioID, p.Name, c.ClientID, c.Name;"
+5,3379419-doc,documentation,,"The following columns are in the Advisors table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  0 | asset-management | dbo            | Advisors     | AdvisorID     | int         |
+|  1 | asset-management | dbo            | Advisors     | Name          | nvarchar    |
+|  2 | asset-management | dbo            | Advisors     | ContactInfo   | nvarchar    |"
+6,3379442-doc,documentation,,"The following columns are in the ClientPortfolioValue table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:--------------------|:------------|
+| 40 | asset-management | dbo            | ClientPortfolioValue | ClientID            | int         |
+| 41 | asset-management | dbo            | ClientPortfolioValue | ClientName          | nvarchar    |
+| 42 | asset-management | dbo            | ClientPortfolioValue | TotalPortfolioValue | numeric     |"
+7,8664892-ddl,ddl,,"CREATE TABLE Accounts (     AccountID INT IDENTITY(1,1) PRIMARY KEY,     AccountType NVARCHAR(50) NOT NULL,     ClientID INT,     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID) );"
+8,3379440-doc,documentation,,"The following columns are in the Projections table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:---------------|:------------|
+| 29 | asset-management | dbo            | Projections  | ProjectionID   | int         |
+| 30 | asset-management | dbo            | Projections  | PortfolioID    | int         |
+| 31 | asset-management | dbo            | Projections  | FutureValue    | decimal     |
+| 32 | asset-management | dbo            | Projections  | ProjectionDate | datetime    |"
+9,8664893-ddl,ddl,,"CREATE TABLE Assets (     AssetID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     AssetType NVARCHAR(50),     CurrentValue DECIMAL(18, 2) );"
+10,8618727-ddl,ddl,,"CREATE PROCEDURE AnalyzeAssetAllocation AS BEGIN SELECT a.AssetID, a.Name AS AssetName, SUM(pa.Allocation) AS TotalAllocationAcrossPortfolios FROM Assets a JOIN PortfolioAssets pa ON a.AssetID = pa.AssetID GROUP BY a.AssetID, a.Name; END;"
+11,3379407-doc,documentation,,"The following columns are in the Accounts table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  8 | asset-management | dbo            | Accounts     | AccountID     | int         |
+|  9 | asset-management | dbo            | Accounts     | AccountType   | nvarchar    |
+| 10 | asset-management | dbo            | Accounts     | ClientID      | int         |"
+12,8664900-ddl,ddl,,"CREATE VIEW PortfolioSummary AS SELECT     p.PortfolioID,     p.Name AS PortfolioName,     c.ClientID,     c.Name AS ClientName,     SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue,     COUNT(DISTINCT pa.AssetID) AS NumberOfAssets FROM     Portfolios p JOIN     Clients c ON p.ClientID = c.ClientID JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID GROUP BY     p.PortfolioID, p.Name, c.ClientID, c.Name;"
+13,8618347-ddl,ddl,,"CREATE TABLE Clients (     ClientID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     ContactInfo NVARCHAR(100),     AdvisorID INT,     RiskProfile NVARCHAR(50),     FOREIGN KEY (AdvisorID) REFERENCES Advisors(AdvisorID) );"
+14,3379441-doc,documentation,,"The following columns are in the PortfolioAssetAllocation table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME               | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------------------|:---------------|:------------|
+| 33 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioID    | int         |
+| 34 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioName  | nvarchar    |
+| 35 | asset-management | dbo            | PortfolioAssetAllocation | AssetID        | int         |
+| 36 | asset-management | dbo            | PortfolioAssetAllocation | AssetName      | nvarchar    |
+| 37 | asset-management | dbo            | PortfolioAssetAllocation | Allocation     | decimal     |
+| 38 | asset-management | dbo            | PortfolioAssetAllocation | CurrentValue   | decimal     |
+| 39 | asset-management | dbo            | PortfolioAssetAllocation | AllocatedValue | numeric     |"
+15,3379455-doc,documentation,,"The following columns are in the Portfolios table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 21 | asset-management | dbo            | Portfolios   | PortfolioID   | int         |
+| 22 | asset-management | dbo            | Portfolios   | ClientID      | int         |
+| 23 | asset-management | dbo            | Portfolios   | Name          | nvarchar    |
+| 24 | asset-management | dbo            | Portfolios   | RiskLevel     | nvarchar    |"
+16,8618717-ddl,ddl,,"CREATE PROCEDURE CalculateClientRiskAssessment AS BEGIN SELECT c.ClientID, c.Name AS ClientName, p.PortfolioID, p.Name AS PortfolioName, p.RiskLevel, SUM(a.CurrentValue * pa.Allocation / 100.0) AS TotalAllocatedValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID GROUP BY c.ClientID, c.Name, p.PortfolioID, p.Name, p.RiskLevel; END;"
+17,3379425-doc,documentation,,"The following columns are in the PortfolioAssets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME      | COLUMN_NAME      | DATA_TYPE   |
+|---:|:-----------------|:---------------|:----------------|:-----------------|:------------|
+| 25 | asset-management | dbo            | PortfolioAssets | PortfolioAssetID | int         |
+| 26 | asset-management | dbo            | PortfolioAssets | PortfolioID      | int         |
+| 27 | asset-management | dbo            | PortfolioAssets | AssetID          | int         |
+| 28 | asset-management | dbo            | PortfolioAssets | Allocation       | decimal     |"
+18,8618719-ddl,ddl,,"CREATE PROCEDURE CalculateTotalPortfolioValue AS BEGIN SELECT c.ClientID, c.Name AS ClientName, p.PortfolioID, p.Name AS PortfolioName, SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID GROUP BY c.ClientID, c.Name, p.PortfolioID, p.Name; END;"
+19,8664895-ddl,ddl,,"-- Create Portfolios table CREATE TABLE Portfolios (     PortfolioID INT IDENTITY(1,1) PRIMARY KEY,     ClientID INT,     Name NVARCHAR(100),     RiskLevel NVARCHAR(50),     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID) );"
+20,3379433-doc,documentation,,"The following columns are in the Advisors table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  0 | asset-management | dbo            | Advisors     | AdvisorID     | int         |
+|  1 | asset-management | dbo            | Advisors     | Name          | nvarchar    |
+|  2 | asset-management | dbo            | Advisors     | ContactInfo   | nvarchar    |"
+21,3379458-doc,documentation,,"The following columns are in the PortfolioAssetAllocation table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME               | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------------------|:---------------|:------------|
+| 33 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioID    | int         |
+| 34 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioName  | nvarchar    |
+| 35 | asset-management | dbo            | PortfolioAssetAllocation | AssetID        | int         |
+| 36 | asset-management | dbo            | PortfolioAssetAllocation | AssetName      | nvarchar    |
+| 37 | asset-management | dbo            | PortfolioAssetAllocation | Allocation     | decimal     |
+| 38 | asset-management | dbo            | PortfolioAssetAllocation | CurrentValue   | decimal     |
+| 39 | asset-management | dbo            | PortfolioAssetAllocation | AllocatedValue | numeric     |"
+22,3379430-doc,documentation,,"The following columns are in the AccountTransactionHistory table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME                | COLUMN_NAME     | DATA_TYPE   |
+|---:|:-----------------|:---------------|:--------------------------|:----------------|:------------|
+| 49 | asset-management | dbo            | AccountTransactionHistory | TransactionID   | int         |
+| 50 | asset-management | dbo            | AccountTransactionHistory | AccountType     | nvarchar    |
+| 51 | asset-management | dbo            | AccountTransactionHistory | AssetID         | int         |
+| 52 | asset-management | dbo            | AccountTransactionHistory | Date            | datetime    |
+| 53 | asset-management | dbo            | AccountTransactionHistory | TransactionType | nvarchar    |
+| 54 | asset-management | dbo            | AccountTransactionHistory | Amount          | decimal     |
+| 55 | asset-management | dbo            | AccountTransactionHistory | CurrentValue    | decimal     |"
+23,3379459-doc,documentation,,"The following columns are in the ClientPortfolioValue table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:--------------------|:------------|
+| 40 | asset-management | dbo            | ClientPortfolioValue | ClientID            | int         |
+| 41 | asset-management | dbo            | ClientPortfolioValue | ClientName          | nvarchar    |
+| 42 | asset-management | dbo            | ClientPortfolioValue | TotalPortfolioValue | numeric     |"
+24,8618369-ddl,ddl,,"CREATE VIEW PortfolioAssetAllocation AS SELECT     p.PortfolioID,     p.Name AS PortfolioName,     pa.AssetID,     a.Name AS AssetName,     pa.Allocation,     a.CurrentValue,     (pa.Allocation / 100.0) * a.CurrentValue AS AllocatedValue FROM     Portfolios p JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID;"
+25,8618706-ddl,ddl,,"CREATE TABLE Accounts (     AccountID INT IDENTITY(1,1) PRIMARY KEY,     AccountType NVARCHAR(50) NOT NULL,     ClientID INT,     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID) );"
+26,3379452-doc,documentation,,"The following columns are in the Accounts table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  8 | asset-management | dbo            | Accounts     | AccountID     | int         |
+|  9 | asset-management | dbo            | Accounts     | AccountType   | nvarchar    |
+| 10 | asset-management | dbo            | Accounts     | ClientID      | int         |"
+27,8664907-ddl,ddl,,"CREATE PROCEDURE AnalyzeAssetAllocation AS BEGIN SELECT a.AssetID, a.Name AS AssetName, SUM(pa.Allocation) AS TotalAllocationAcrossPortfolios FROM Assets a JOIN PortfolioAssets pa ON a.AssetID = pa.AssetID GROUP BY a.AssetID, a.Name; END;"
+28,3379428-doc,documentation,,"The following columns are in the ClientPortfolioValue table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:--------------------|:------------|
+| 40 | asset-management | dbo            | ClientPortfolioValue | ClientID            | int         |
+| 41 | asset-management | dbo            | ClientPortfolioValue | ClientName          | nvarchar    |
+| 42 | asset-management | dbo            | ClientPortfolioValue | TotalPortfolioValue | numeric     |"
+29,3379418-doc,documentation,,"Wealth Asset Management Database Documentation
+
+Overview
+The Wealth Asset Management database is designed to support a wealth management platform. It provides a structured and organized way to manage clients' portfolios, financial accounts, assets, transactions, and risk assessments. This database aims to help wealth managers oversee their clients' financial standings, evaluate risks, and generate insights and projections for future wealth growth.
+
+The database comprises several tables, views, and stored procedures. It stores detailed information about clients, their portfolios, assets, accounts, and transaction histories. It also contains key metrics related to risk assessment and wealth projections. The views provide a summarized, digestible view of this data for wealth managers, while stored procedures perform complex operations such as risk assessment and portfolio analysis.
+
+---
+
+ Schema Design
+
+Key Entities and Relationships
+
+1. Clients
+   - Represents individuals or organizations that are being managed by wealth managers.
+   - Relationships:
+     - Each client can have multiple portfolios.
+     - Each client is associated with multiple financial accounts.
+
+2. Portfolios
+   - Represents collections of assets that belong to a specific client.
+   - Relationships:
+     - A portfolio belongs to one client.
+     - A portfolio contains multiple assets.
+     - A portfolio is associated with transactions.
+
+3. Assets
+   - Represents individual financial products (e.g., stocks, bonds, real estate) within a portfolio.
+   - Relationships:
+     - An asset belongs to a specific portfolio.
+     - An asset can be involved in multiple transactions.
+
+4. Financial Accounts
+   - Represents bank accounts or investment accounts held by clients.
+   - Relationships:
+     - Each financial account is associated with one client.
+     - Financial accounts track account balance and are linked to transactions.
+
+5. Transactions
+   - Represents financial operations like buying or selling assets, deposits, and withdrawals.
+   - Relationships:
+     - A transaction is linked to a specific account.
+     - Transactions are associated with assets and portfolios.
+     - Each transaction impacts the overall portfolio value and client wealth.
+
+6. Risk Assessments
+   - Tracks the risk levels associated with individual clients based on their financial activities.
+   - Relationships:
+     - Each client is assigned a risk score.
+
+---
+
+ Tables
+
+1. Clients
+   - Stores details about the client, such as name, date of birth, and contact information.
+   - Columns:
+     - `ClientID`: Primary key
+     - `Name`, `Email`, `DateOfBirth`, etc.
+
+2. Portfolios
+   - Stores information about the portfolios managed for each client.
+   - Columns:
+     - `PortfolioID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `PortfolioName`, `CreationDate`
+
+3. Assets
+   - Stores individual assets within a portfolio.
+   - Columns:
+     - `AssetID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetType`, `AssetValue`
+
+4. FinancialAccounts
+   - Stores account information related to clients.
+   - Columns:
+     - `AccountID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `AccountNumber`, `AccountType`, `Balance`
+
+5. Transactions
+   - Stores details of transactions involving assets and accounts.
+   - Columns:
+     - `TransactionID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetID`: Foreign key referencing `Assets`
+     - `AccountID`: Foreign key referencing `FinancialAccounts`
+     - `TransactionDate`, `TransactionAmount`
+
+6. RiskAssessments
+   - Stores risk assessment data for clients.
+   - Columns:
+     - `AssessmentID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `RiskScore`, `AssessmentDate`
+
+---
+
+ Views
+
+1. PortfolioAssetAllocation
+   - Provides a detailed view of asset allocation within each portfolio.
+   - Shows how the client's investments are spread across different asset types.
+
+2. ClientPortfolioValue
+   - Summarizes the total value managed for each client.
+   - Gives an overview of the combined portfolio value across all assets for each client.
+
+3. PortfolioSummary
+   - Offers a comprehensive view of each portfolio.
+   - Includes the total value and distribution of assets.
+
+4. AccountTransactionHistory
+   - Displays a chronological list of all transactions.
+   - Useful for monitoring recent activities in a client's financial accounts.
+
+5. OverallWealthSummary
+   - Summarizes the total wealth managed by breaking it down by asset type.
+   - Provides a high-level view of a clientâ€™s wealth distribution.
+
+---
+
+ Stored Procedures
+
+1. RiskAssessmentProcedure
+   - This procedure calculates the risk assessment for each client based on the clientâ€™s portfolio allocation, asset volatility, and transaction history. It aggregates risk scores and updates the client's risk level in the database.
+
+   ```sql
+   EXEC RiskAssessmentProcedure @ClientID;
+   ```
+
+2. PortfolioAnalysisProcedure
+   - Analyzes the overall performance of a clientâ€™s portfolio. This procedure calculates metrics such as the total portfolio value, asset distribution, and recent transactions.
+   - It provides an overview of how the portfolio is performing and flags any major risks.
+
+   ```sql
+   EXEC PortfolioAnalysisProcedure @PortfolioID;
+   ```
+
+3. TransactionHistoryProcedure
+   - Generates a detailed report of the transaction history for a specific portfolio or account.
+   - This procedure helps wealth managers trace past financial activities for auditing and analysis purposes.
+
+   ```sql
+   EXEC TransactionHistoryProcedure @PortfolioID;
+   ```
+
+4. WealthProjectionProcedure
+   - Calculates future projections of wealth growth based on current asset values, expected returns, and market trends.
+   - This helps clients and managers make informed decisions about future investments.
+
+   ```sql
+   EXEC WealthProjectionProcedure @ClientID;
+   ```
+
+---
+
+ Relationships and Integrity Constraints
+
+- Foreign Keys: Enforce referential integrity between tables such as `ClientID` in `Portfolios` and `FinancialAccounts`, `PortfolioID` in `Assets` and `Transactions`, etc.
+- Primary Keys: Uniquely identify each record in every table (e.g., `ClientID`, `PortfolioID`, `TransactionID`).
+- Indexes: Optimize queries on common access patterns, particularly for foreign keys and portfolio summaries.
+
+ Use Cases
+
+1. Wealth Managerâ€™s Dashboard
+   - Uses views like `PortfolioAssetAllocation`, `ClientPortfolioValue`, and `OverallWealthSummary` to display an overview of a clientâ€™s wealth status and performance.
+
+2. Client Portfolio Analysis
+   - Wealth managers can execute stored procedures to perform deeper portfolio analysis, identify risks, and generate wealth projections for strategic planning.
+
+3. Transaction Monitoring
+   - By utilizing the `AccountTransactionHistory` view and `TransactionHistoryProcedure`, wealth managers can track recent account activities to detect unusual behavior or opportunities for intervention.
+
+ Conclusion
+
+This Wealth Asset Management Database is designed to meet the needs of wealth managers who require comprehensive visibility into client portfolios, risk assessments, and future wealth projections. It incorporates efficient data organization and provides useful tools for decision-making through its well-structured schema, views, and stored procedures."
+30,8664898-ddl,ddl,,"CREATE VIEW PortfolioAssetAllocation AS SELECT     p.PortfolioID,     p.Name AS PortfolioName,     pa.AssetID,     a.Name AS AssetName,     pa.Allocation,     a.CurrentValue,     (pa.Allocation / 100.0) * a.CurrentValue AS AllocatedValue FROM     Portfolios p JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID;"
+31,3379445-doc,documentation,,"The following columns are in the OverallWealthSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:---------------|:------------|
+| 56 | asset-management | dbo            | OverallWealthSummary | AssetType      | nvarchar    |
+| 57 | asset-management | dbo            | OverallWealthSummary | NumberOfAssets | int         |
+| 58 | asset-management | dbo            | OverallWealthSummary | TotalWealth    | decimal     |"
+32,8618367-ddl,ddl,,"-- Create Projections table CREATE TABLE Projections (     ProjectionID INT IDENTITY(1,1) PRIMARY KEY,     PortfolioID INT,     FutureValue DECIMAL(18, 2),     ProjectionDate DATETIME,     FOREIGN KEY (PortfolioID) REFERENCES Portfolios(PortfolioID) );"
+33,3379453-doc,documentation,,"The following columns are in the Assets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 11 | asset-management | dbo            | Assets       | AssetID       | int         |
+| 12 | asset-management | dbo            | Assets       | Name          | nvarchar    |
+| 13 | asset-management | dbo            | Assets       | AssetType     | nvarchar    |
+| 14 | asset-management | dbo            | Assets       | CurrentValue  | decimal     |"
+34,8618712-ddl,ddl,,"CREATE VIEW PortfolioAssetAllocation AS SELECT     p.PortfolioID,     p.Name AS PortfolioName,     pa.AssetID,     a.Name AS AssetName,     pa.Allocation,     a.CurrentValue,     (pa.Allocation / 100.0) * a.CurrentValue AS AllocatedValue FROM     Portfolios p JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID;"
+35,8618358-ddl,ddl,,"CREATE TABLE Transactions (     TransactionID INT IDENTITY(1,1) PRIMARY KEY,     AccountID INT,     AssetID INT,     Date DATETIME,     Type NVARCHAR(50),     Amount DECIMAL(18, 2),     FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),     FOREIGN KEY (AssetID) REFERENCES Assets(AssetID) );"
+36,3379439-doc,documentation,,"The following columns are in the PortfolioAssets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME      | COLUMN_NAME      | DATA_TYPE   |
+|---:|:-----------------|:---------------|:----------------|:-----------------|:------------|
+| 25 | asset-management | dbo            | PortfolioAssets | PortfolioAssetID | int         |
+| 26 | asset-management | dbo            | PortfolioAssets | PortfolioID      | int         |
+| 27 | asset-management | dbo            | PortfolioAssets | AssetID          | int         |
+| 28 | asset-management | dbo            | PortfolioAssets | Allocation       | decimal     |"
+37,3379422-doc,documentation,,"The following columns are in the Assets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 11 | asset-management | dbo            | Assets       | AssetID       | int         |
+| 12 | asset-management | dbo            | Assets       | Name          | nvarchar    |
+| 13 | asset-management | dbo            | Assets       | AssetType     | nvarchar    |
+| 14 | asset-management | dbo            | Assets       | CurrentValue  | decimal     |"
+38,3379437-doc,documentation,,"The following columns are in the Transactions table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 15 | asset-management | dbo            | Transactions | TransactionID | int         |
+| 16 | asset-management | dbo            | Transactions | AccountID     | int         |
+| 17 | asset-management | dbo            | Transactions | AssetID       | int         |
+| 18 | asset-management | dbo            | Transactions | Date          | datetime    |
+| 19 | asset-management | dbo            | Transactions | Type          | nvarchar    |
+| 20 | asset-management | dbo            | Transactions | Amount        | decimal     |"
+39,8618705-ddl,ddl,,"CREATE TABLE Clients (     ClientID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     ContactInfo NVARCHAR(100),     AdvisorID INT,     RiskProfile NVARCHAR(50),     FOREIGN KEY (AdvisorID) REFERENCES Advisors(AdvisorID) );"
+40,8618381-ddl,ddl,,"CREATE VIEW OverallWealthSummary AS SELECT     a.AssetType,     COUNT(a.AssetID) AS NumberOfAssets,     SUM(a.CurrentValue) AS TotalWealth FROM     Assets a GROUP BY     a.AssetType;"
+41,3379438-doc,documentation,,"The following columns are in the Portfolios table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 21 | asset-management | dbo            | Portfolios   | PortfolioID   | int         |
+| 22 | asset-management | dbo            | Portfolios   | ClientID      | int         |
+| 23 | asset-management | dbo            | Portfolios   | Name          | nvarchar    |
+| 24 | asset-management | dbo            | Portfolios   | RiskLevel     | nvarchar    |"
+42,8618714-ddl,ddl,,"CREATE VIEW PortfolioSummary AS SELECT     p.PortfolioID,     p.Name AS PortfolioName,     c.ClientID,     c.Name AS ClientName,     SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue,     COUNT(DISTINCT pa.AssetID) AS NumberOfAssets FROM     Portfolios p JOIN     Clients c ON p.ClientID = c.ClientID JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID GROUP BY     p.PortfolioID, p.Name, c.ClientID, c.Name;"
+43,3379416-doc,documentation,,"The following columns are in the AccountTransactionHistory table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME                | COLUMN_NAME     | DATA_TYPE   |
+|---:|:-----------------|:---------------|:--------------------------|:----------------|:------------|
+| 49 | asset-management | dbo            | AccountTransactionHistory | TransactionID   | int         |
+| 50 | asset-management | dbo            | AccountTransactionHistory | AccountType     | nvarchar    |
+| 51 | asset-management | dbo            | AccountTransactionHistory | AssetID         | int         |
+| 52 | asset-management | dbo            | AccountTransactionHistory | Date            | datetime    |
+| 53 | asset-management | dbo            | AccountTransactionHistory | TransactionType | nvarchar    |
+| 54 | asset-management | dbo            | AccountTransactionHistory | Amount          | decimal     |
+| 55 | asset-management | dbo            | AccountTransactionHistory | CurrentValue    | decimal     |"
+44,3379443-doc,documentation,,"The following columns are in the PortfolioSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME       | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-----------------|:--------------------|:------------|
+| 43 | asset-management | dbo            | PortfolioSummary | PortfolioID         | int         |
+| 44 | asset-management | dbo            | PortfolioSummary | PortfolioName       | nvarchar    |
+| 45 | asset-management | dbo            | PortfolioSummary | ClientID            | int         |
+| 46 | asset-management | dbo            | PortfolioSummary | ClientName          | nvarchar    |
+| 47 | asset-management | dbo            | PortfolioSummary | TotalPortfolioValue | numeric     |
+| 48 | asset-management | dbo            | PortfolioSummary | NumberOfAssets      | int         |"
+45,3379463-doc,documentation,,"Wealth Asset Management Database Documentation
+
+Overview
+The Wealth Asset Management database is designed to support a wealth management platform. It provides a structured and organized way to manage clients' portfolios, financial accounts, assets, transactions, and risk assessments. This database aims to help wealth managers oversee their clients' financial standings, evaluate risks, and generate insights and projections for future wealth growth.
+
+The database comprises several tables, views, and stored procedures. It stores detailed information about clients, their portfolios, assets, accounts, and transaction histories. It also contains key metrics related to risk assessment and wealth projections. The views provide a summarized, digestible view of this data for wealth managers, while stored procedures perform complex operations such as risk assessment and portfolio analysis.
+
+---
+
+ Schema Design
+
+Key Entities and Relationships
+
+1. Clients
+   - Represents individuals or organizations that are being managed by wealth managers.
+   - Relationships:
+     - Each client can have multiple portfolios.
+     - Each client is associated with multiple financial accounts.
+
+2. Portfolios
+   - Represents collections of assets that belong to a specific client.
+   - Relationships:
+     - A portfolio belongs to one client.
+     - A portfolio contains multiple assets.
+     - A portfolio is associated with transactions.
+
+3. Assets
+   - Represents individual financial products (e.g., stocks, bonds, real estate) within a portfolio.
+   - Relationships:
+     - An asset belongs to a specific portfolio.
+     - An asset can be involved in multiple transactions.
+
+4. Financial Accounts
+   - Represents bank accounts or investment accounts held by clients.
+   - Relationships:
+     - Each financial account is associated with one client.
+     - Financial accounts track account balance and are linked to transactions.
+
+5. Transactions
+   - Represents financial operations like buying or selling assets, deposits, and withdrawals.
+   - Relationships:
+     - A transaction is linked to a specific account.
+     - Transactions are associated with assets and portfolios.
+     - Each transaction impacts the overall portfolio value and client wealth.
+
+6. Risk Assessments
+   - Tracks the risk levels associated with individual clients based on their financial activities.
+   - Relationships:
+     - Each client is assigned a risk score.
+
+---
+
+ Tables
+
+1. Clients
+   - Stores details about the client, such as name, date of birth, and contact information.
+   - Columns:
+     - `ClientID`: Primary key
+     - `Name`, `Email`, `DateOfBirth`, etc.
+
+2. Portfolios
+   - Stores information about the portfolios managed for each client.
+   - Columns:
+     - `PortfolioID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `PortfolioName`, `CreationDate`
+
+3. Assets
+   - Stores individual assets within a portfolio.
+   - Columns:
+     - `AssetID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetType`, `AssetValue`
+
+4. FinancialAccounts
+   - Stores account information related to clients.
+   - Columns:
+     - `AccountID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `AccountNumber`, `AccountType`, `Balance`
+
+5. Transactions
+   - Stores details of transactions involving assets and accounts.
+   - Columns:
+     - `TransactionID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetID`: Foreign key referencing `Assets`
+     - `AccountID`: Foreign key referencing `FinancialAccounts`
+     - `TransactionDate`, `TransactionAmount`
+
+6. RiskAssessments
+   - Stores risk assessment data for clients.
+   - Columns:
+     - `AssessmentID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `RiskScore`, `AssessmentDate`
+
+---
+
+ Views
+
+1. PortfolioAssetAllocation
+   - Provides a detailed view of asset allocation within each portfolio.
+   - Shows how the client's investments are spread across different asset types.
+
+2. ClientPortfolioValue
+   - Summarizes the total value managed for each client.
+   - Gives an overview of the combined portfolio value across all assets for each client.
+
+3. PortfolioSummary
+   - Offers a comprehensive view of each portfolio.
+   - Includes the total value and distribution of assets.
+
+4. AccountTransactionHistory
+   - Displays a chronological list of all transactions.
+   - Useful for monitoring recent activities in a client's financial accounts.
+
+5. OverallWealthSummary
+   - Summarizes the total wealth managed by breaking it down by asset type.
+   - Provides a high-level view of a clientâ€™s wealth distribution.
+
+---
+
+ Stored Procedures
+
+1. RiskAssessmentProcedure
+   - This procedure calculates the risk assessment for each client based on the clientâ€™s portfolio allocation, asset volatility, and transaction history. It aggregates risk scores and updates the client's risk level in the database.
+
+   ```sql
+   EXEC RiskAssessmentProcedure @ClientID;
+   ```
+
+2. PortfolioAnalysisProcedure
+   - Analyzes the overall performance of a clientâ€™s portfolio. This procedure calculates metrics such as the total portfolio value, asset distribution, and recent transactions.
+   - It provides an overview of how the portfolio is performing and flags any major risks.
+
+   ```sql
+   EXEC PortfolioAnalysisProcedure @PortfolioID;
+   ```
+
+3. TransactionHistoryProcedure
+   - Generates a detailed report of the transaction history for a specific portfolio or account.
+   - This procedure helps wealth managers trace past financial activities for auditing and analysis purposes.
+
+   ```sql
+   EXEC TransactionHistoryProcedure @PortfolioID;
+   ```
+
+4. WealthProjectionProcedure
+   - Calculates future projections of wealth growth based on current asset values, expected returns, and market trends.
+   - This helps clients and managers make informed decisions about future investments.
+
+   ```sql
+   EXEC WealthProjectionProcedure @ClientID;
+   ```
+
+---
+
+ Relationships and Integrity Constraints
+
+- Foreign Keys: Enforce referential integrity between tables such as `ClientID` in `Portfolios` and `FinancialAccounts`, `PortfolioID` in `Assets` and `Transactions`, etc.
+- Primary Keys: Uniquely identify each record in every table (e.g., `ClientID`, `PortfolioID`, `TransactionID`).
+- Indexes: Optimize queries on common access patterns, particularly for foreign keys and portfolio summaries.
+
+ Use Cases
+
+1. Wealth Managerâ€™s Dashboard
+   - Uses views like `PortfolioAssetAllocation`, `ClientPortfolioValue`, and `OverallWealthSummary` to display an overview of a clientâ€™s wealth status and performance.
+
+2. Client Portfolio Analysis
+   - Wealth managers can execute stored procedures to perform deeper portfolio analysis, identify risks, and generate wealth projections for strategic planning.
+
+3. Transaction Monitoring
+   - By utilizing the `AccountTransactionHistory` view and `TransactionHistoryProcedure`, wealth managers can track recent account activities to detect unusual behavior or opportunities for intervention.
+
+ Conclusion
+
+This Wealth Asset Management Database is designed to meet the needs of wealth managers who require comprehensive visibility into client portfolios, risk assessments, and future wealth projections. It incorporates efficient data organization and provides useful tools for decision-making through its well-structured schema, views, and stored procedures."
+46,8664890-ddl,ddl,,"CREATE TABLE Advisors (     AdvisorID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     ContactInfo NVARCHAR(100) );"
+47,3379450-doc,documentation,,"The following columns are in the Advisors table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  0 | asset-management | dbo            | Advisors     | AdvisorID     | int         |
+|  1 | asset-management | dbo            | Advisors     | Name          | nvarchar    |
+|  2 | asset-management | dbo            | Advisors     | ContactInfo   | nvarchar    |"
+48,3379413-doc,documentation,,"The following columns are in the PortfolioAssetAllocation table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME               | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------------------|:---------------|:------------|
+| 33 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioID    | int         |
+| 34 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioName  | nvarchar    |
+| 35 | asset-management | dbo            | PortfolioAssetAllocation | AssetID        | int         |
+| 36 | asset-management | dbo            | PortfolioAssetAllocation | AssetName      | nvarchar    |
+| 37 | asset-management | dbo            | PortfolioAssetAllocation | Allocation     | decimal     |
+| 38 | asset-management | dbo            | PortfolioAssetAllocation | CurrentValue   | decimal     |
+| 39 | asset-management | dbo            | PortfolioAssetAllocation | AllocatedValue | numeric     |"
+49,8664906-ddl,ddl,,"CREATE PROCEDURE GetPortfolioPerformanceOverTime @ClientID INT AS BEGIN SELECT p.PortfolioID, p.Name AS PortfolioName, t.Date, SUM(t.Amount) AS TotalTransactionValue, SUM(pa.Allocation * a.CurrentValue / 100.0) AS CurrentPortfolioValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID LEFT JOIN Transactions t ON t.AssetID = a.AssetID WHERE c.ClientID = @ClientID GROUP BY p.PortfolioID, p.Name, t.Date; END;"
+50,8618716-ddl,ddl,,"CREATE VIEW OverallWealthSummary AS SELECT     a.AssetType,     COUNT(a.AssetID) AS NumberOfAssets,     SUM(a.CurrentValue) AS TotalWealth FROM     Assets a GROUP BY     a.AssetType;"
+51,3379427-doc,documentation,,"The following columns are in the PortfolioAssetAllocation table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME               | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------------------|:---------------|:------------|
+| 33 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioID    | int         |
+| 34 | asset-management | dbo            | PortfolioAssetAllocation | PortfolioName  | nvarchar    |
+| 35 | asset-management | dbo            | PortfolioAssetAllocation | AssetID        | int         |
+| 36 | asset-management | dbo            | PortfolioAssetAllocation | AssetName      | nvarchar    |
+| 37 | asset-management | dbo            | PortfolioAssetAllocation | Allocation     | decimal     |
+| 38 | asset-management | dbo            | PortfolioAssetAllocation | CurrentValue   | decimal     |
+| 39 | asset-management | dbo            | PortfolioAssetAllocation | AllocatedValue | numeric     |"
+52,8618715-ddl,ddl,,"CREATE VIEW AccountTransactionHistory AS SELECT     t.TransactionID,          acc.AccountType,     a.AssetID,     t.Date,     t.Type AS TransactionType,     t.Amount,     a.CurrentValue FROM     Transactions t JOIN     Accounts acc ON t.AccountID = acc.AccountID JOIN     Assets a ON t.AssetID = a.AssetID ;"
+53,8618704-ddl,ddl,,"CREATE TABLE Advisors (     AdvisorID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     ContactInfo NVARCHAR(100) );"
+54,8664896-ddl,ddl,,"-- Create PortfolioAssets table CREATE TABLE PortfolioAssets (     PortfolioAssetID INT IDENTITY(1,1) PRIMARY KEY,     PortfolioID INT,     AssetID INT,     Allocation DECIMAL(18, 2),     FOREIGN KEY (PortfolioID) REFERENCES Portfolios(PortfolioID),     FOREIGN KEY (AssetID) REFERENCES Assets(AssetID) );"
+55,3379432-doc,documentation,,"Wealth Asset Management Database Documentation
+
+Overview
+The Wealth Asset Management database is designed to support a wealth management platform. It provides a structured and organized way to manage clients' portfolios, financial accounts, assets, transactions, and risk assessments. This database aims to help wealth managers oversee their clients' financial standings, evaluate risks, and generate insights and projections for future wealth growth.
+
+The database comprises several tables, views, and stored procedures. It stores detailed information about clients, their portfolios, assets, accounts, and transaction histories. It also contains key metrics related to risk assessment and wealth projections. The views provide a summarized, digestible view of this data for wealth managers, while stored procedures perform complex operations such as risk assessment and portfolio analysis.
+
+---
+
+ Schema Design
+
+Key Entities and Relationships
+
+1. Clients
+   - Represents individuals or organizations that are being managed by wealth managers.
+   - Relationships:
+     - Each client can have multiple portfolios.
+     - Each client is associated with multiple financial accounts.
+
+2. Portfolios
+   - Represents collections of assets that belong to a specific client.
+   - Relationships:
+     - A portfolio belongs to one client.
+     - A portfolio contains multiple assets.
+     - A portfolio is associated with transactions.
+
+3. Assets
+   - Represents individual financial products (e.g., stocks, bonds, real estate) within a portfolio.
+   - Relationships:
+     - An asset belongs to a specific portfolio.
+     - An asset can be involved in multiple transactions.
+
+4. Financial Accounts
+   - Represents bank accounts or investment accounts held by clients.
+   - Relationships:
+     - Each financial account is associated with one client.
+     - Financial accounts track account balance and are linked to transactions.
+
+5. Transactions
+   - Represents financial operations like buying or selling assets, deposits, and withdrawals.
+   - Relationships:
+     - A transaction is linked to a specific account.
+     - Transactions are associated with assets and portfolios.
+     - Each transaction impacts the overall portfolio value and client wealth.
+
+6. Risk Assessments
+   - Tracks the risk levels associated with individual clients based on their financial activities.
+   - Relationships:
+     - Each client is assigned a risk score.
+
+---
+
+ Tables
+
+1. Clients
+   - Stores details about the client, such as name, date of birth, and contact information.
+   - Columns:
+     - `ClientID`: Primary key
+     - `Name`, `Email`, `DateOfBirth`, etc.
+
+2. Portfolios
+   - Stores information about the portfolios managed for each client.
+   - Columns:
+     - `PortfolioID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `PortfolioName`, `CreationDate`
+
+3. Assets
+   - Stores individual assets within a portfolio.
+   - Columns:
+     - `AssetID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetType`, `AssetValue`
+
+4. FinancialAccounts
+   - Stores account information related to clients.
+   - Columns:
+     - `AccountID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `AccountNumber`, `AccountType`, `Balance`
+
+5. Transactions
+   - Stores details of transactions involving assets and accounts.
+   - Columns:
+     - `TransactionID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetID`: Foreign key referencing `Assets`
+     - `AccountID`: Foreign key referencing `FinancialAccounts`
+     - `TransactionDate`, `TransactionAmount`
+
+6. RiskAssessments
+   - Stores risk assessment data for clients.
+   - Columns:
+     - `AssessmentID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `RiskScore`, `AssessmentDate`
+
+---
+
+ Views
+
+1. PortfolioAssetAllocation
+   - Provides a detailed view of asset allocation within each portfolio.
+   - Shows how the client's investments are spread across different asset types.
+
+2. ClientPortfolioValue
+   - Summarizes the total value managed for each client.
+   - Gives an overview of the combined portfolio value across all assets for each client.
+
+3. PortfolioSummary
+   - Offers a comprehensive view of each portfolio.
+   - Includes the total value and distribution of assets.
+
+4. AccountTransactionHistory
+   - Displays a chronological list of all transactions.
+   - Useful for monitoring recent activities in a client's financial accounts.
+
+5. OverallWealthSummary
+   - Summarizes the total wealth managed by breaking it down by asset type.
+   - Provides a high-level view of a clientâ€™s wealth distribution.
+
+---
+
+ Stored Procedures
+
+1. RiskAssessmentProcedure
+   - This procedure calculates the risk assessment for each client based on the clientâ€™s portfolio allocation, asset volatility, and transaction history. It aggregates risk scores and updates the client's risk level in the database.
+
+   ```sql
+   EXEC RiskAssessmentProcedure @ClientID;
+   ```
+
+2. PortfolioAnalysisProcedure
+   - Analyzes the overall performance of a clientâ€™s portfolio. This procedure calculates metrics such as the total portfolio value, asset distribution, and recent transactions.
+   - It provides an overview of how the portfolio is performing and flags any major risks.
+
+   ```sql
+   EXEC PortfolioAnalysisProcedure @PortfolioID;
+   ```
+
+3. TransactionHistoryProcedure
+   - Generates a detailed report of the transaction history for a specific portfolio or account.
+   - This procedure helps wealth managers trace past financial activities for auditing and analysis purposes.
+
+   ```sql
+   EXEC TransactionHistoryProcedure @PortfolioID;
+   ```
+
+4. WealthProjectionProcedure
+   - Calculates future projections of wealth growth based on current asset values, expected returns, and market trends.
+   - This helps clients and managers make informed decisions about future investments.
+
+   ```sql
+   EXEC WealthProjectionProcedure @ClientID;
+   ```
+
+---
+
+ Relationships and Integrity Constraints
+
+- Foreign Keys: Enforce referential integrity between tables such as `ClientID` in `Portfolios` and `FinancialAccounts`, `PortfolioID` in `Assets` and `Transactions`, etc.
+- Primary Keys: Uniquely identify each record in every table (e.g., `ClientID`, `PortfolioID`, `TransactionID`).
+- Indexes: Optimize queries on common access patterns, particularly for foreign keys and portfolio summaries.
+
+ Use Cases
+
+1. Wealth Managerâ€™s Dashboard
+   - Uses views like `PortfolioAssetAllocation`, `ClientPortfolioValue`, and `OverallWealthSummary` to display an overview of a clientâ€™s wealth status and performance.
+
+2. Client Portfolio Analysis
+   - Wealth managers can execute stored procedures to perform deeper portfolio analysis, identify risks, and generate wealth projections for strategic planning.
+
+3. Transaction Monitoring
+   - By utilizing the `AccountTransactionHistory` view and `TransactionHistoryProcedure`, wealth managers can track recent account activities to detect unusual behavior or opportunities for intervention.
+
+ Conclusion
+
+This Wealth Asset Management Database is designed to meet the needs of wealth managers who require comprehensive visibility into client portfolios, risk assessments, and future wealth projections. It incorporates efficient data organization and provides useful tools for decision-making through its well-structured schema, views, and stored procedures."
+56,3379408-doc,documentation,,"The following columns are in the Assets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 11 | asset-management | dbo            | Assets       | AssetID       | int         |
+| 12 | asset-management | dbo            | Assets       | Name          | nvarchar    |
+| 13 | asset-management | dbo            | Assets       | AssetType     | nvarchar    |
+| 14 | asset-management | dbo            | Assets       | CurrentValue  | decimal     |"
+57,3379409-doc,documentation,,"The following columns are in the Transactions table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 15 | asset-management | dbo            | Transactions | TransactionID | int         |
+| 16 | asset-management | dbo            | Transactions | AccountID     | int         |
+| 17 | asset-management | dbo            | Transactions | AssetID       | int         |
+| 18 | asset-management | dbo            | Transactions | Date          | datetime    |
+| 19 | asset-management | dbo            | Transactions | Type          | nvarchar    |
+| 20 | asset-management | dbo            | Transactions | Amount        | decimal     |"
+58,3379457-doc,documentation,,"The following columns are in the Projections table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:---------------|:------------|
+| 29 | asset-management | dbo            | Projections  | ProjectionID   | int         |
+| 30 | asset-management | dbo            | Projections  | PortfolioID    | int         |
+| 31 | asset-management | dbo            | Projections  | FutureValue    | decimal     |
+| 32 | asset-management | dbo            | Projections  | ProjectionDate | datetime    |"
+59,3379414-doc,documentation,,"The following columns are in the ClientPortfolioValue table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:--------------------|:------------|
+| 40 | asset-management | dbo            | ClientPortfolioValue | ClientID            | int         |
+| 41 | asset-management | dbo            | ClientPortfolioValue | ClientName          | nvarchar    |
+| 42 | asset-management | dbo            | ClientPortfolioValue | TotalPortfolioValue | numeric     |"
+60,8664891-ddl,ddl,,"CREATE TABLE Clients (     ClientID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     ContactInfo NVARCHAR(100),     AdvisorID INT,     RiskProfile NVARCHAR(50),     FOREIGN KEY (AdvisorID) REFERENCES Advisors(AdvisorID) );"
+61,3379456-doc,documentation,,"The following columns are in the PortfolioAssets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME      | COLUMN_NAME      | DATA_TYPE   |
+|---:|:-----------------|:---------------|:----------------|:-----------------|:------------|
+| 25 | asset-management | dbo            | PortfolioAssets | PortfolioAssetID | int         |
+| 26 | asset-management | dbo            | PortfolioAssets | PortfolioID      | int         |
+| 27 | asset-management | dbo            | PortfolioAssets | AssetID          | int         |
+| 28 | asset-management | dbo            | PortfolioAssets | Allocation       | decimal     |"
+62,3379429-doc,documentation,,"The following columns are in the PortfolioSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME       | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-----------------|:--------------------|:------------|
+| 43 | asset-management | dbo            | PortfolioSummary | PortfolioID         | int         |
+| 44 | asset-management | dbo            | PortfolioSummary | PortfolioName       | nvarchar    |
+| 45 | asset-management | dbo            | PortfolioSummary | ClientID            | int         |
+| 46 | asset-management | dbo            | PortfolioSummary | ClientName          | nvarchar    |
+| 47 | asset-management | dbo            | PortfolioSummary | TotalPortfolioValue | numeric     |
+| 48 | asset-management | dbo            | PortfolioSummary | NumberOfAssets      | int         |"
+63,8618707-ddl,ddl,,"CREATE TABLE Assets (     AssetID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     AssetType NVARCHAR(50),     CurrentValue DECIMAL(18, 2) );"
+64,3379461-doc,documentation,,"The following columns are in the AccountTransactionHistory table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME                | COLUMN_NAME     | DATA_TYPE   |
+|---:|:-----------------|:---------------|:--------------------------|:----------------|:------------|
+| 49 | asset-management | dbo            | AccountTransactionHistory | TransactionID   | int         |
+| 50 | asset-management | dbo            | AccountTransactionHistory | AccountType     | nvarchar    |
+| 51 | asset-management | dbo            | AccountTransactionHistory | AssetID         | int         |
+| 52 | asset-management | dbo            | AccountTransactionHistory | Date            | datetime    |
+| 53 | asset-management | dbo            | AccountTransactionHistory | TransactionType | nvarchar    |
+| 54 | asset-management | dbo            | AccountTransactionHistory | Amount          | decimal     |
+| 55 | asset-management | dbo            | AccountTransactionHistory | CurrentValue    | decimal     |"
+65,8664897-ddl,ddl,,"-- Create Projections table CREATE TABLE Projections (     ProjectionID INT IDENTITY(1,1) PRIMARY KEY,     PortfolioID INT,     FutureValue DECIMAL(18, 2),     ProjectionDate DATETIME,     FOREIGN KEY (PortfolioID) REFERENCES Portfolios(PortfolioID) );"
+66,8618709-ddl,ddl,,"-- Create Portfolios table CREATE TABLE Portfolios (     PortfolioID INT IDENTITY(1,1) PRIMARY KEY,     ClientID INT,     Name NVARCHAR(100),     RiskLevel NVARCHAR(50),     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID) );"
+67,8664894-ddl,ddl,,"CREATE TABLE Transactions (     TransactionID INT IDENTITY(1,1) PRIMARY KEY,     AccountID INT,     AssetID INT,     Date DATETIME,     Type NVARCHAR(50),     Amount DECIMAL(18, 2),     FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),     FOREIGN KEY (AssetID) REFERENCES Assets(AssetID) );"
+68,3379444-doc,documentation,,"The following columns are in the AccountTransactionHistory table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME                | COLUMN_NAME     | DATA_TYPE   |
+|---:|:-----------------|:---------------|:--------------------------|:----------------|:------------|
+| 49 | asset-management | dbo            | AccountTransactionHistory | TransactionID   | int         |
+| 50 | asset-management | dbo            | AccountTransactionHistory | AccountType     | nvarchar    |
+| 51 | asset-management | dbo            | AccountTransactionHistory | AssetID         | int         |
+| 52 | asset-management | dbo            | AccountTransactionHistory | Date            | datetime    |
+| 53 | asset-management | dbo            | AccountTransactionHistory | TransactionType | nvarchar    |
+| 54 | asset-management | dbo            | AccountTransactionHistory | Amount          | decimal     |
+| 55 | asset-management | dbo            | AccountTransactionHistory | CurrentValue    | decimal     |"
+69,8618724-ddl,ddl,,"CREATE PROCEDURE GetPortfolioPerformanceOverTime @ClientID INT AS BEGIN SELECT p.PortfolioID, p.Name AS PortfolioName, t.Date, SUM(t.Amount) AS TotalTransactionValue, SUM(pa.Allocation * a.CurrentValue / 100.0) AS CurrentPortfolioValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID LEFT JOIN Transactions t ON t.AssetID = a.AssetID WHERE c.ClientID = @ClientID GROUP BY p.PortfolioID, p.Name, t.Date; END;"
+70,3379423-doc,documentation,,"The following columns are in the Transactions table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 15 | asset-management | dbo            | Transactions | TransactionID | int         |
+| 16 | asset-management | dbo            | Transactions | AccountID     | int         |
+| 17 | asset-management | dbo            | Transactions | AssetID       | int         |
+| 18 | asset-management | dbo            | Transactions | Date          | datetime    |
+| 19 | asset-management | dbo            | Transactions | Type          | nvarchar    |
+| 20 | asset-management | dbo            | Transactions | Amount        | decimal     |"
+71,3379410-doc,documentation,,"The following columns are in the Portfolios table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 21 | asset-management | dbo            | Portfolios   | PortfolioID   | int         |
+| 22 | asset-management | dbo            | Portfolios   | ClientID      | int         |
+| 23 | asset-management | dbo            | Portfolios   | Name          | nvarchar    |
+| 24 | asset-management | dbo            | Portfolios   | RiskLevel     | nvarchar    |"
+72,8618721-ddl,ddl,,"CREATE PROCEDURE IdentifyUnderperformingAssets @Threshold DECIMAL(18,2), @DaysInterval INT AS BEGIN SELECT a.AssetID, a.Name AS AssetName, a.CurrentValue, COUNT(t.TransactionID) AS NumTransactions FROM Assets a LEFT JOIN Transactions t ON a.AssetID = t.AssetID WHERE t.Date >= DATEADD(DAY, -@DaysInterval, GETDATE()) GROUP BY a.AssetID, a.Name, a.CurrentValue HAVING COUNT(t.TransactionID) < @Threshold; END;"
+73,8618711-ddl,ddl,,"-- Create Projections table CREATE TABLE Projections (     ProjectionID INT IDENTITY(1,1) PRIMARY KEY,     PortfolioID INT,     FutureValue DECIMAL(18, 2),     ProjectionDate DATETIME,     FOREIGN KEY (PortfolioID) REFERENCES Portfolios(PortfolioID) );"
+74,8664899-ddl,ddl,,"CREATE VIEW ClientPortfolioValue AS SELECT     c.ClientID,     c.Name AS ClientName,     SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue FROM     Clients c JOIN     Portfolios p ON c.ClientID = p.ClientID JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID GROUP BY     c.ClientID, c.Name;"
+75,3379405-doc,documentation,,"The following columns are in the Advisors table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  0 | asset-management | dbo            | Advisors     | AdvisorID     | int         |
+|  1 | asset-management | dbo            | Advisors     | Name          | nvarchar    |
+|  2 | asset-management | dbo            | Advisors     | ContactInfo   | nvarchar    |"
+76,8664904-ddl,ddl,,"CREATE PROCEDURE CalculateTotalPortfolioValue AS BEGIN SELECT c.ClientID, c.Name AS ClientName, p.PortfolioID, p.Name AS PortfolioName, SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID GROUP BY c.ClientID, c.Name, p.PortfolioID, p.Name; END;"
+77,8618395-ddl,ddl,,"CREATE PROCEDURE AnalyzeAssetAllocation AS BEGIN SELECT a.AssetID, a.Name AS AssetName, SUM(pa.Allocation) AS TotalAllocationAcrossPortfolios FROM Assets a JOIN PortfolioAssets pa ON a.AssetID = pa.AssetID GROUP BY a.AssetID, a.Name; END;"
+78,8664902-ddl,ddl,,"CREATE VIEW OverallWealthSummary AS SELECT     a.AssetType,     COUNT(a.AssetID) AS NumberOfAssets,     SUM(a.CurrentValue) AS TotalWealth FROM     Assets a GROUP BY     a.AssetType;"
+79,8618386-ddl,ddl,,"CREATE PROCEDURE CalculateTotalPortfolioValue AS BEGIN SELECT c.ClientID, c.Name AS ClientName, p.PortfolioID, p.Name AS PortfolioName, SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID GROUP BY c.ClientID, c.Name, p.PortfolioID, p.Name; END;"
+80,3379451-doc,documentation,,"The following columns are in the Clients table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  3 | asset-management | dbo            | Clients      | ClientID      | int         |
+|  4 | asset-management | dbo            | Clients      | Name          | nvarchar    |
+|  5 | asset-management | dbo            | Clients      | ContactInfo   | nvarchar    |
+|  6 | asset-management | dbo            | Clients      | AdvisorID     | int         |
+|  7 | asset-management | dbo            | Clients      | RiskProfile   | nvarchar    |"
+81,8618372-ddl,ddl,,"CREATE VIEW ClientPortfolioValue AS SELECT     c.ClientID,     c.Name AS ClientName,     SUM(pa.Allocation * a.CurrentValue / 100.0) AS TotalPortfolioValue FROM     Clients c JOIN     Portfolios p ON c.ClientID = p.ClientID JOIN     PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN     Assets a ON pa.AssetID = a.AssetID GROUP BY     c.ClientID, c.Name;"
+82,3379460-doc,documentation,,"The following columns are in the PortfolioSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME       | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-----------------|:--------------------|:------------|
+| 43 | asset-management | dbo            | PortfolioSummary | PortfolioID         | int         |
+| 44 | asset-management | dbo            | PortfolioSummary | PortfolioName       | nvarchar    |
+| 45 | asset-management | dbo            | PortfolioSummary | ClientID            | int         |
+| 46 | asset-management | dbo            | PortfolioSummary | ClientName          | nvarchar    |
+| 47 | asset-management | dbo            | PortfolioSummary | TotalPortfolioValue | numeric     |
+| 48 | asset-management | dbo            | PortfolioSummary | NumberOfAssets      | int         |"
+83,3379420-doc,documentation,,"The following columns are in the Clients table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  3 | asset-management | dbo            | Clients      | ClientID      | int         |
+|  4 | asset-management | dbo            | Clients      | Name          | nvarchar    |
+|  5 | asset-management | dbo            | Clients      | ContactInfo   | nvarchar    |
+|  6 | asset-management | dbo            | Clients      | AdvisorID     | int         |
+|  7 | asset-management | dbo            | Clients      | RiskProfile   | nvarchar    |"
+84,8618350-ddl,ddl,,"CREATE TABLE Accounts (     AccountID INT IDENTITY(1,1) PRIMARY KEY,     AccountType NVARCHAR(50) NOT NULL,     ClientID INT,     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID) );"
+85,3379426-doc,documentation,,"The following columns are in the Projections table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:---------------|:------------|
+| 29 | asset-management | dbo            | Projections  | ProjectionID   | int         |
+| 30 | asset-management | dbo            | Projections  | PortfolioID    | int         |
+| 31 | asset-management | dbo            | Projections  | FutureValue    | decimal     |
+| 32 | asset-management | dbo            | Projections  | ProjectionDate | datetime    |"
+86,3379436-doc,documentation,,"The following columns are in the Assets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 11 | asset-management | dbo            | Assets       | AssetID       | int         |
+| 12 | asset-management | dbo            | Assets       | Name          | nvarchar    |
+| 13 | asset-management | dbo            | Assets       | AssetType     | nvarchar    |
+| 14 | asset-management | dbo            | Assets       | CurrentValue  | decimal     |"
+87,3379415-doc,documentation,,"The following columns are in the PortfolioSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME       | COLUMN_NAME         | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-----------------|:--------------------|:------------|
+| 43 | asset-management | dbo            | PortfolioSummary | PortfolioID         | int         |
+| 44 | asset-management | dbo            | PortfolioSummary | PortfolioName       | nvarchar    |
+| 45 | asset-management | dbo            | PortfolioSummary | ClientID            | int         |
+| 46 | asset-management | dbo            | PortfolioSummary | ClientName          | nvarchar    |
+| 47 | asset-management | dbo            | PortfolioSummary | TotalPortfolioValue | numeric     |
+| 48 | asset-management | dbo            | PortfolioSummary | NumberOfAssets      | int         |"
+88,8618361-ddl,ddl,,"-- Create Portfolios table CREATE TABLE Portfolios (     PortfolioID INT IDENTITY(1,1) PRIMARY KEY,     ClientID INT,     Name NVARCHAR(100),     RiskLevel NVARCHAR(50),     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID) );"
+89,8618355-ddl,ddl,,"CREATE TABLE Assets (     AssetID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     AssetType NVARCHAR(50),     CurrentValue DECIMAL(18, 2) );"
+90,3379412-doc,documentation,,"The following columns are in the Projections table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:---------------|:------------|
+| 29 | asset-management | dbo            | Projections  | ProjectionID   | int         |
+| 30 | asset-management | dbo            | Projections  | PortfolioID    | int         |
+| 31 | asset-management | dbo            | Projections  | FutureValue    | decimal     |
+| 32 | asset-management | dbo            | Projections  | ProjectionDate | datetime    |"
+91,3379424-doc,documentation,,"The following columns are in the Portfolios table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 21 | asset-management | dbo            | Portfolios   | PortfolioID   | int         |
+| 22 | asset-management | dbo            | Portfolios   | ClientID      | int         |
+| 23 | asset-management | dbo            | Portfolios   | Name          | nvarchar    |
+| 24 | asset-management | dbo            | Portfolios   | RiskLevel     | nvarchar    |"
+92,8664905-ddl,ddl,,"CREATE PROCEDURE IdentifyUnderperformingAssets @Threshold DECIMAL(18,2), @DaysInterval INT AS BEGIN SELECT a.AssetID, a.Name AS AssetName, a.CurrentValue, COUNT(t.TransactionID) AS NumTransactions FROM Assets a LEFT JOIN Transactions t ON a.AssetID = t.AssetID WHERE t.Date >= DATEADD(DAY, -@DaysInterval, GETDATE()) GROUP BY a.AssetID, a.Name, a.CurrentValue HAVING COUNT(t.TransactionID) < @Threshold; END;"
+93,3379431-doc,documentation,,"The following columns are in the OverallWealthSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:---------------|:------------|
+| 56 | asset-management | dbo            | OverallWealthSummary | AssetType      | nvarchar    |
+| 57 | asset-management | dbo            | OverallWealthSummary | NumberOfAssets | int         |
+| 58 | asset-management | dbo            | OverallWealthSummary | TotalWealth    | decimal     |"
+94,8618392-ddl,ddl,,"CREATE PROCEDURE GetPortfolioPerformanceOverTime @ClientID INT AS BEGIN SELECT p.PortfolioID, p.Name AS PortfolioName, t.Date, SUM(t.Amount) AS TotalTransactionValue, SUM(pa.Allocation * a.CurrentValue / 100.0) AS CurrentPortfolioValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID LEFT JOIN Transactions t ON t.AssetID = a.AssetID WHERE c.ClientID = @ClientID GROUP BY p.PortfolioID, p.Name, t.Date; END;"
+95,8618364-ddl,ddl,,"-- Create PortfolioAssets table CREATE TABLE PortfolioAssets (     PortfolioAssetID INT IDENTITY(1,1) PRIMARY KEY,     PortfolioID INT,     AssetID INT,     Allocation DECIMAL(18, 2),     FOREIGN KEY (PortfolioID) REFERENCES Portfolios(PortfolioID),     FOREIGN KEY (AssetID) REFERENCES Assets(AssetID) );"
+96,3379411-doc,documentation,,"The following columns are in the PortfolioAssets table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME      | COLUMN_NAME      | DATA_TYPE   |
+|---:|:-----------------|:---------------|:----------------|:-----------------|:------------|
+| 25 | asset-management | dbo            | PortfolioAssets | PortfolioAssetID | int         |
+| 26 | asset-management | dbo            | PortfolioAssets | PortfolioID      | int         |
+| 27 | asset-management | dbo            | PortfolioAssets | AssetID          | int         |
+| 28 | asset-management | dbo            | PortfolioAssets | Allocation       | decimal     |"
+97,3379454-doc,documentation,,"The following columns are in the Transactions table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+| 15 | asset-management | dbo            | Transactions | TransactionID | int         |
+| 16 | asset-management | dbo            | Transactions | AccountID     | int         |
+| 17 | asset-management | dbo            | Transactions | AssetID       | int         |
+| 18 | asset-management | dbo            | Transactions | Date          | datetime    |
+| 19 | asset-management | dbo            | Transactions | Type          | nvarchar    |
+| 20 | asset-management | dbo            | Transactions | Amount        | decimal     |"
+98,8618708-ddl,ddl,,"CREATE TABLE Transactions (     TransactionID INT IDENTITY(1,1) PRIMARY KEY,     AccountID INT,     AssetID INT,     Date DATETIME,     Type NVARCHAR(50),     Amount DECIMAL(18, 2),     FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),     FOREIGN KEY (AssetID) REFERENCES Assets(AssetID) );"
+99,3379406-doc,documentation,,"The following columns are in the Clients table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  3 | asset-management | dbo            | Clients      | ClientID      | int         |
+|  4 | asset-management | dbo            | Clients      | Name          | nvarchar    |
+|  5 | asset-management | dbo            | Clients      | ContactInfo   | nvarchar    |
+|  6 | asset-management | dbo            | Clients      | AdvisorID     | int         |
+|  7 | asset-management | dbo            | Clients      | RiskProfile   | nvarchar    |"
+100,8664903-ddl,ddl,,"CREATE PROCEDURE CalculateClientRiskAssessment AS BEGIN SELECT c.ClientID, c.Name AS ClientName, p.PortfolioID, p.Name AS PortfolioName, p.RiskLevel, SUM(a.CurrentValue * pa.Allocation / 100.0) AS TotalAllocatedValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID GROUP BY c.ClientID, c.Name, p.PortfolioID, p.Name, p.RiskLevel; END;"
+101,3379417-doc,documentation,,"The following columns are in the OverallWealthSummary table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME           | COLUMN_NAME    | DATA_TYPE   |
+|---:|:-----------------|:---------------|:---------------------|:---------------|:------------|
+| 56 | asset-management | dbo            | OverallWealthSummary | AssetType      | nvarchar    |
+| 57 | asset-management | dbo            | OverallWealthSummary | NumberOfAssets | int         |
+| 58 | asset-management | dbo            | OverallWealthSummary | TotalWealth    | decimal     |"
+102,3379435-doc,documentation,,"The following columns are in the Accounts table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  8 | asset-management | dbo            | Accounts     | AccountID     | int         |
+|  9 | asset-management | dbo            | Accounts     | AccountType   | nvarchar    |
+| 10 | asset-management | dbo            | Accounts     | ClientID      | int         |"
+103,3379421-doc,documentation,,"The following columns are in the Accounts table in the asset-management database:
+
+|    | TABLE_CATALOG    | TABLE_SCHEMA   | TABLE_NAME   | COLUMN_NAME   | DATA_TYPE   |
+|---:|:-----------------|:---------------|:-------------|:--------------|:------------|
+|  8 | asset-management | dbo            | Accounts     | AccountID     | int         |
+|  9 | asset-management | dbo            | Accounts     | AccountType   | nvarchar    |
+| 10 | asset-management | dbo            | Accounts     | ClientID      | int         |"
+104,8664901-ddl,ddl,,"CREATE VIEW AccountTransactionHistory AS SELECT     t.TransactionID,          acc.AccountType,     a.AssetID,     t.Date,     t.Type AS TransactionType,     t.Amount,     a.CurrentValue FROM     Transactions t JOIN     Accounts acc ON t.AccountID = acc.AccountID JOIN     Assets a ON t.AssetID = a.AssetID ;"
+105,8618344-ddl,ddl,,"CREATE TABLE Advisors (     AdvisorID INT IDENTITY(1,1) PRIMARY KEY,     Name NVARCHAR(100) NOT NULL,     ContactInfo NVARCHAR(100) );"
+106,8618383-ddl,ddl,,"CREATE PROCEDURE CalculateClientRiskAssessment AS BEGIN SELECT c.ClientID, c.Name AS ClientName, p.PortfolioID, p.Name AS PortfolioName, p.RiskLevel, SUM(a.CurrentValue * pa.Allocation / 100.0) AS TotalAllocatedValue FROM Clients c JOIN Portfolios p ON c.ClientID = p.ClientID JOIN PortfolioAssets pa ON p.PortfolioID = pa.PortfolioID JOIN Assets a ON pa.AssetID = a.AssetID GROUP BY c.ClientID, c.Name, p.PortfolioID, p.Name, p.RiskLevel; END;"
+107,8618389-ddl,ddl,,"CREATE PROCEDURE IdentifyUnderperformingAssets @Threshold DECIMAL(18,2), @DaysInterval INT AS BEGIN SELECT a.AssetID, a.Name AS AssetName, a.CurrentValue, COUNT(t.TransactionID) AS NumTransactions FROM Assets a LEFT JOIN Transactions t ON a.AssetID = t.AssetID WHERE t.Date >= DATEADD(DAY, -@DaysInterval, GETDATE()) GROUP BY a.AssetID, a.Name, a.CurrentValue HAVING COUNT(t.TransactionID) < @Threshold; END;"
+108,8618710-ddl,ddl,,"-- Create PortfolioAssets table CREATE TABLE PortfolioAssets (     PortfolioAssetID INT IDENTITY(1,1) PRIMARY KEY,     PortfolioID INT,     AssetID INT,     Allocation DECIMAL(18, 2),     FOREIGN KEY (PortfolioID) REFERENCES Portfolios(PortfolioID),     FOREIGN KEY (AssetID) REFERENCES Assets(AssetID) );"

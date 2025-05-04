@@ -1,0 +1,178 @@
+Wealth Asset Management Database Documentation
+
+Overview
+The Wealth Asset Management database is designed to support a wealth management platform. It provides a structured and organized way to manage clients' portfolios, financial accounts, assets, transactions, and risk assessments. This database aims to help wealth managers oversee their clients' financial standings, evaluate risks, and generate insights and projections for future wealth growth.
+
+The database comprises several tables, views, and stored procedures. It stores detailed information about clients, their portfolios, assets, accounts, and transaction histories. It also contains key metrics related to risk assessment and wealth projections. The views provide a summarized, digestible view of this data for wealth managers, while stored procedures perform complex operations such as risk assessment and portfolio analysis.
+
+---
+
+ Schema Design
+
+Key Entities and Relationships
+
+1. Clients
+   - Represents individuals or organizations that are being managed by wealth managers.
+   - Relationships:
+     - Each client can have multiple portfolios.
+     - Each client is associated with multiple financial accounts.
+
+2. Portfolios
+   - Represents collections of assets that belong to a specific client.
+   - Relationships:
+     - A portfolio belongs to one client.
+     - A portfolio contains multiple assets.
+     - A portfolio is associated with transactions.
+
+3. Assets
+   - Represents individual financial products (e.g., stocks, bonds, real estate) within a portfolio.
+   - Relationships:
+     - An asset belongs to a specific portfolio.
+     - An asset can be involved in multiple transactions.
+
+4. Financial Accounts
+   - Represents bank accounts or investment accounts held by clients.
+   - Relationships:
+     - Each financial account is associated with one client.
+     - Financial accounts track account balance and are linked to transactions.
+
+5. Transactions
+   - Represents financial operations like buying or selling assets, deposits, and withdrawals.
+   - Relationships:
+     - A transaction is linked to a specific account.
+     - Transactions are associated with assets and portfolios.
+     - Each transaction impacts the overall portfolio value and client wealth.
+
+6. Risk Assessments
+   - Tracks the risk levels associated with individual clients based on their financial activities.
+   - Relationships:
+     - Each client is assigned a risk score.
+
+---
+
+ Tables
+
+1. Clients
+   - Stores details about the client, such as name, date of birth, and contact information.
+   - Columns:
+     - `ClientID`: Primary key
+     - `Name`, `Email`, `DateOfBirth`, etc.
+
+2. Portfolios
+   - Stores information about the portfolios managed for each client.
+   - Columns:
+     - `PortfolioID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `PortfolioName`, `CreationDate`
+
+3. Assets
+   - Stores individual assets within a portfolio.
+   - Columns:
+     - `AssetID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetType`, `AssetValue`
+
+4. FinancialAccounts
+   - Stores account information related to clients.
+   - Columns:
+     - `AccountID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `AccountNumber`, `AccountType`, `Balance`
+
+5. Transactions
+   - Stores details of transactions involving assets and accounts.
+   - Columns:
+     - `TransactionID`: Primary key
+     - `PortfolioID`: Foreign key referencing `Portfolios`
+     - `AssetID`: Foreign key referencing `Assets`
+     - `AccountID`: Foreign key referencing `FinancialAccounts`
+     - `TransactionDate`, `TransactionAmount`
+
+6. RiskAssessments
+   - Stores risk assessment data for clients.
+   - Columns:
+     - `AssessmentID`: Primary key
+     - `ClientID`: Foreign key referencing `Clients`
+     - `RiskScore`, `AssessmentDate`
+
+---
+
+ Views
+
+1. PortfolioAssetAllocation
+   - Provides a detailed view of asset allocation within each portfolio.
+   - Shows how the client's investments are spread across different asset types.
+
+2. ClientPortfolioValue
+   - Summarizes the total value managed for each client.
+   - Gives an overview of the combined portfolio value across all assets for each client.
+
+3. PortfolioSummary
+   - Offers a comprehensive view of each portfolio.
+   - Includes the total value and distribution of assets.
+
+4. AccountTransactionHistory
+   - Displays a chronological list of all transactions.
+   - Useful for monitoring recent activities in a client's financial accounts.
+
+5. OverallWealthSummary
+   - Summarizes the total wealth managed by breaking it down by asset type.
+   - Provides a high-level view of a client’s wealth distribution.
+
+---
+
+ Stored Procedures
+
+1. RiskAssessmentProcedure
+   - This procedure calculates the risk assessment for each client based on the client’s portfolio allocation, asset volatility, and transaction history. It aggregates risk scores and updates the client's risk level in the database.
+
+   ```sql
+   EXEC RiskAssessmentProcedure @ClientID;
+   ```
+
+2. PortfolioAnalysisProcedure
+   - Analyzes the overall performance of a client’s portfolio. This procedure calculates metrics such as the total portfolio value, asset distribution, and recent transactions.
+   - It provides an overview of how the portfolio is performing and flags any major risks.
+
+   ```sql
+   EXEC PortfolioAnalysisProcedure @PortfolioID;
+   ```
+
+3. TransactionHistoryProcedure
+   - Generates a detailed report of the transaction history for a specific portfolio or account.
+   - This procedure helps wealth managers trace past financial activities for auditing and analysis purposes.
+
+   ```sql
+   EXEC TransactionHistoryProcedure @PortfolioID;
+   ```
+
+4. WealthProjectionProcedure
+   - Calculates future projections of wealth growth based on current asset values, expected returns, and market trends.
+   - This helps clients and managers make informed decisions about future investments.
+
+   ```sql
+   EXEC WealthProjectionProcedure @ClientID;
+   ```
+
+---
+
+ Relationships and Integrity Constraints
+
+- Foreign Keys: Enforce referential integrity between tables such as `ClientID` in `Portfolios` and `FinancialAccounts`, `PortfolioID` in `Assets` and `Transactions`, etc.
+- Primary Keys: Uniquely identify each record in every table (e.g., `ClientID`, `PortfolioID`, `TransactionID`).
+- Indexes: Optimize queries on common access patterns, particularly for foreign keys and portfolio summaries.
+
+ Use Cases
+
+1. Wealth Manager’s Dashboard
+   - Uses views like `PortfolioAssetAllocation`, `ClientPortfolioValue`, and `OverallWealthSummary` to display an overview of a client’s wealth status and performance.
+
+2. Client Portfolio Analysis
+   - Wealth managers can execute stored procedures to perform deeper portfolio analysis, identify risks, and generate wealth projections for strategic planning.
+
+3. Transaction Monitoring
+   - By utilizing the `AccountTransactionHistory` view and `TransactionHistoryProcedure`, wealth managers can track recent account activities to detect unusual behavior or opportunities for intervention.
+
+ Conclusion
+
+This Wealth Asset Management Database is designed to meet the needs of wealth managers who require comprehensive visibility into client portfolios, risk assessments, and future wealth projections. It incorporates efficient data organization and provides useful tools for decision-making through its well-structured schema, views, and stored procedures.
