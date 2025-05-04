@@ -22,6 +22,7 @@ VannaAIFinancialReporting/
 │ VisualizeSQLRAG.py
 │
 ├───Resources
+|     AppDemo.gif
 │     AppVisualization.pdf
 │     Data_Description.png
 │
@@ -96,6 +97,9 @@ Train your Vanna model using schema and contextual artifacts:
 1. Run following code to see the app on your browser and test your questions:
     
     ```python .\VisualizeSQLRAG.py```
+
+## 👀 App Preview
+![ER Diagram](Resources/AppDemo.gif)
 
 ## 📌 Notes
 - Item that starts with a bullet-like dot. Ensure that your SQL server allows remote connections and Vanna AI has access.
