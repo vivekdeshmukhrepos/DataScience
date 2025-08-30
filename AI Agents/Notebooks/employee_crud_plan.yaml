@@ -1,0 +1,26 @@
+goal: Perform full CRUD operations on employee database
+steps:
+  - tool: postgres_insert_query
+    action: __call__
+    inputs:
+      query: "INSERT INTO employees (id, name, department, salary) VALUES (1005, 'Alice Kumar', 'Marketing', 62000);"
+
+  - tool: postgres_select_query
+    action: __call__
+    inputs:
+      query: "SELECT * FROM employees WHERE id = 1005;"
+
+  - tool: postgres_update_query
+    action: __call__
+    inputs:
+      query: "UPDATE employees SET salary = 65000 WHERE id = 1005;"
+
+  - tool: postgres_delete_query
+    action: __call__
+    inputs:
+      query: "DELETE FROM employees WHERE id = 1005;"
+
+  - tool: gpt_explain
+    action: __call__
+    inputs:
+      query: "Summarize what happened in the CRUD sequence above for employee 1005."
